@@ -384,28 +384,32 @@ Letters: ${letters1} + ${letters2} = ${letters1 + letters2}
     });
 
     doc.save("comparison_result.pdf");
-  } else if (format === "docx") {
-    const blob = new Blob([finalResult], {
-      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    });
-    saveAs(blob, "comparison_result.docx");
-  }
-}
-} else if (format === "docx") {
+ } else if (format === "docx") {
   const { Document, Packer, Paragraph, TextRun } = window.docx;
 
-  const paragraphs = finalResult.split("\n").map(line => 
-    new Paragraph({ children: [new TextRun(line)] })
+  // Split result into lines
+  const lines = finalResult.split("\n");
+
+  // Convert lines to Word paragraphs
+  const paragraphs = lines.map(line =>
+    new Paragraph({
+      children: [new TextRun({ text: line, break: 1 })]
+    })
   );
 
   const docFile = new Document({
-    sections: [{ properties: {}, children: paragraphs }],
+    sections: [{
+      properties: {},
+      children: paragraphs
+    }]
   });
 
+  // Generate and save
   Packer.toBlob(docFile).then(blob => {
     saveAs(blob, "comparison_result.docx");
   });
 }
+
 
     function clearAll() {
       document.getElementById("text1").value = "";
