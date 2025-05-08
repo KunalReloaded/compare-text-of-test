@@ -10,6 +10,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+  <script src="https://unpkg.com/docx@8.1.0/build/index.umd.js"></script>
+
 
   <style>
     body {
@@ -388,6 +390,21 @@ Letters: ${letters1} + ${letters2} = ${letters1 + letters2}
     });
     saveAs(blob, "comparison_result.docx");
   }
+}
+} else if (format === "docx") {
+  const { Document, Packer, Paragraph, TextRun } = window.docx;
+
+  const paragraphs = finalResult.split("\n").map(line => 
+    new Paragraph({ children: [new TextRun(line)] })
+  );
+
+  const docFile = new Document({
+    sections: [{ properties: {}, children: paragraphs }],
+  });
+
+  Packer.toBlob(docFile).then(blob => {
+    saveAs(blob, "comparison_result.docx");
+  });
 }
 
     function clearAll() {
